@@ -4,6 +4,16 @@ Sentiment-driven trading signal system that scores SEC EDGAR earnings filings an
 
 ---
 
+## Screenshots
+
+![Main dashboard — sentiment timeline, equity curve, correlation scatter](screenshots/01_main_dashboard.png)
+
+![Signal table and VIX regime scatter overlay](screenshots/02_signal_table_regime.png)
+
+![Transcript scrubber and entity-level sentiment tag cloud](screenshots/03_scrubber_entities.png)
+
+---
+
 ## What it does
 
 1. **Fetches data** — SEC EDGAR 8-K filings (Exhibit 99.1 press releases) via the free EDGAR API; financial news via NewsAPI restricted to 15 reputable financial domains; OHLCV prices via yfinance.
