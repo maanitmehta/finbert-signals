@@ -1,0 +1,23 @@
+# Web / Dashboard
+dash>=4.0.0
+dash-bootstrap-components>=2.0.0
+plotly>=6.0.0
+
+# Data
+pandas>=2.0.0
+numpy>=1.26.0
+yfinance>=1.0.0
+scipy>=1.11.0
+
+# Networking / Parsing
+requests>=2.32.0
+beautifulsoup4>=4.12.0
+
+# Config
+python-dotenv>=1.0.0
+
+# NLP (heavy — ~2 GB; install once)
+transformers>=4.40.0
+torch>=2.3.0
+spacy>=3.7.0
+# After pip install spacy: python -m spacy download en_core_web_sm

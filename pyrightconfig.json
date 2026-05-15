@@ -1,0 +1,6 @@
+{
+  "pythonVersion": "3.9.6",
+  "venvPath": ".",
+  "venv": "venv",
+  "extraPaths": [".", "dashboard"]
+}
