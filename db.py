@@ -78,6 +78,21 @@ def init_db() -> None:
         """)
 
 
+def migrate_price_horizons() -> None:
+    """Add multi-horizon return columns to the prices table if they don't exist.
+
+    return_Nd = (close[t+n] / close[t]) - 1 for n in {2, 3, 5, 10, 20}.
+    Values are populated by fetchers/prices.py::compute_and_store_horizons().
+    This migration only creates the columns; it does not fill them.
+    """
+    with get_conn() as conn:
+        existing = {r[1] for r in conn.execute("PRAGMA table_info(prices)").fetchall()}
+        for col in ("return_2d", "return_3d", "return_5d", "return_10d", "return_20d"):
+            if col not in existing:
+                conn.execute(f"ALTER TABLE prices ADD COLUMN {col} REAL")
+                print(f"Migration: added prices.{col} column")
+
+
 def migrate() -> None:
     """Safe migrations for columns added after initial schema creation."""
     with get_conn() as conn:
@@ -85,6 +100,7 @@ def migrate() -> None:
         if "relevant" not in cols:
             conn.execute("ALTER TABLE articles ADD COLUMN relevant INTEGER DEFAULT 1")
             print("Migration: added articles.relevant column")
+    migrate_price_horizons()
 
 
 if __name__ == "__main__":

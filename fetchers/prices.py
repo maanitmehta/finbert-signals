@@ -66,6 +66,57 @@ def fetch_and_store(ticker: str, start: str, end: str) -> int:
     return stored
 
 
+def compute_and_store_horizons(ticker: str) -> int:
+    """Compute and persist multi-day forward returns from prices already in DB.
+
+    For every row in the prices table for `ticker`, computes:
+        return_Nd = (close[t+n] / close[t]) - 1   for n ∈ {2, 3, 5, 10, 20}
+
+    These are close-to-close returns over n trading days, calculated entirely
+    from the OHLCV data already stored — no additional yfinance calls needed.
+    Rows near the end of the series that lack n future closes are set to NULL.
+
+    Returns the number of price rows updated.
+    """
+    ticker = ticker.upper()
+    with get_conn() as conn:
+        df = pd.read_sql_query(
+            "SELECT date, close FROM prices WHERE ticker=? ORDER BY date",
+            conn,
+            params=[ticker],
+        )
+
+    if df.empty:
+        return 0
+
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.set_index("date").sort_index()
+    close = df["close"]
+
+    horizon_series = {
+        n: (close.shift(-n) / close - 1)
+        for n in (2, 3, 5, 10, 20)
+    }
+
+    updates = []
+    for ts, _ in df.iterrows():
+        vals = [
+            None if pd.isna(horizon_series[n].get(ts)) else float(horizon_series[n].get(ts))
+            for n in (2, 3, 5, 10, 20)
+        ]
+        updates.append((*vals, ticker, ts.strftime("%Y-%m-%d")))
+
+    with get_conn() as conn:
+        conn.executemany(
+            """UPDATE prices
+               SET return_2d=?, return_3d=?, return_5d=?, return_10d=?, return_20d=?
+               WHERE ticker=? AND date=?""",
+            updates,
+        )
+
+    return len(updates)
+
+
 if __name__ == "__main__":
     import sys
     from pathlib import Path
