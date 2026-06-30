@@ -64,7 +64,7 @@ Sentiment-driven trading signal system that scores SEC EDGAR earnings filings an
 ```bash
 git clone https://github.com/maanitmehta/finbert-signals.git
 cd finbert-signals
-python -m venv venv && source venv/bin/activate
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
